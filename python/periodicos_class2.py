@@ -29,7 +29,7 @@ driver = webdriver.Chrome()
 #############################################################################
 """Tirando titulos, vinculos, etc CLASS """ 
 #############################################################################
-
+""" Ignoralo
 class wait_for_page_load(object):
 
     def __init__(self, browser, tag):
@@ -45,7 +45,7 @@ class wait_for_page_load(object):
 
     def __exit__(self, *_):
         wait_for(self.page_has_loaded)
-
+"""
 #############################################################################
 """EL PAIS"""
 #############################################################################
@@ -54,7 +54,6 @@ def ElPaisTP2(key, wait=0):
     
     # go to the google home page
     driver.get("http://elpais.com/buscador/")
-    time.sleep(wait)
 
     # find the element that's name attribute is q (the google search box)
     try :
@@ -75,9 +74,9 @@ def ElPaisTP2(key, wait=0):
     pageDoing = 1
     
     def cogerDatos() :
-        time.sleep(wait)
-        #Nos movemos a lo largo de todos los resultados de la búsqueda extrayendo la info 
-        for res in driver.find_elements_by_class_name('article'):
+        element = WebDriverWait(driver, wait*2).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "article")))        #Nos movemos a lo largo de todos los resultados de la búsqueda extrayendo la info 
+        for res in element:
             try :
                 noticia = {}
                 titulo = res.find_element_by_css_selector('div.noticia h2 a').text
@@ -103,25 +102,24 @@ def ElPaisTP2(key, wait=0):
                 temp2 = temp.find_elements_by_tag_name("a")
                 temp3 = temp2[0].get_attribute("href")
                 
-                if temp3.encode("utf-8") != 'javascript:void(0);' :
+                if temp3.encode("utf-8") != 'javascript:void(0);' and pageDoing<7 :
                     temp2[0].click()
                     cogerDatos()
                     pageDoing +=1 
                     print "       .....scraping pagina no. %s......      " % pageDoing
                 else :
-                    print "no hay mas paginas con resultados"
+                    print "no hay mas paginas con resultado ... or ... too many pages ... moving to next empresa..."
                     proximaPaginaBool = 1
             except :
                 print ("no hay mas paginas con resultados", sys.exc_info()[0])
                 proximaPaginaBool = 1
         
-        time.sleep(wait)
         return(resultados)
     
     except:
         print('Ha ocurrido un error con la busqueda de '+key)
         print("Unexpected error:", sys.exc_info()[0])
-        time.sleep(2)
+        return(resultados)
         
 
 #############################################################################
@@ -152,10 +150,10 @@ def ElMundoTP2(key, wait=0):
     pageDoing = 1
     
     def cogerDatos() :
-        time.sleep(wait)
-
+        element = WebDriverWait(driver, wait*2).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "lista_resultados")))
         #Nos movemos a lo largo de todos los resultados de la búsqueda extrayendo la info 
-        busc = driver.find_element_by_class_name('lista_resultados')
+        busc = element
         for res in busc.find_elements_by_css_selector('li'):
             try :
                 noticia = {}
@@ -170,12 +168,12 @@ def ElMundoTP2(key, wait=0):
                 #print(fuente)            
                 parrafo = res.find_elements_by_tag_name('p')[3].text
                 #print(parrafo)            
-                noticia['Empresa']=key
-                noticia['titulo']=titulo
-                noticia['link']=link
-                noticia['autor']=fuente
-                noticia['fecha']=fecha
-                noticia['parrafo']=parrafo
+                noticia['Empresa'] =key
+                noticia['titulo'] =titulo
+                noticia['link'] =link
+                noticia['autor'] =fuente
+                noticia['fecha'] =fecha
+                noticia['parrafo'] =parrafo
                 resultados.append(noticia)
                 print ".... anexo resultad con titulo:.... %s      ....." % titulo
             except :
@@ -186,15 +184,16 @@ def ElMundoTP2(key, wait=0):
         print "tried once"
         while proximaPaginaBool == 0 :
             try:
-                time.sleep(wait)
-                temp = driver.find_element_by_class_name("nav_resultados") # verificando si hay mas que una pagina
+                element = WebDriverWait(driver, wait*2).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "nav_resultados")))
+                temp = element # verificando si hay mas que una pagina
                 temp2 = temp.find_elements_by_tag_name("a")
                 temp3 = temp2[-1].text
-                if temp3.encode("utf-8") == 'Siguiente \xc2\xbb' :
+                if temp3.encode("utf-8") == 'Siguiente \xc2\xbb' and pageDoing<7:
                     temp2[-1].click()
                     print "clicking"
                 else :
-                    print "no hay mas paginas con resultados"
+                    print "no hay mas paginas con resultados... o no quieremos mas que 15 paginas de resultados"
                     proximaPaginaBool = 1
                     
                 cogerDatos()
@@ -208,7 +207,8 @@ def ElMundoTP2(key, wait=0):
     except :
         print('Ha ocurrido un error con la busqueda de '+key)
         print("Unexpected error:", sys.exc_info()[0])
-        time.sleep(2)
+        return(resultados)
+
         
 #############################################################################
 """EXPANSION"""
@@ -225,7 +225,7 @@ def ExpansionTP2(key, wait=2) :
         inputElement = element
     except :
         print "hay alguno terible en tu codigo......"
-
+        inputElement = driver.find_element_by_id("buscar")
 
         
     # type in the search
@@ -261,25 +261,27 @@ def ExpansionTP2(key, wait=2) :
         cogerDatos()
         while proximaPaginaBool == 0 :
             try :
-                time.sleep(wait)
-                temp = driver.find_element_by_class_name("siguiente")
-                temp.click()
-                cogerDatos()
-                pageDoing +=1 
-                print "       .....scraping pagina no. %s......      " % pageDoing
+                if pageDoing<7 :
+                    time.sleep(wait)
+                    temp = driver.find_element_by_class_name("siguiente")
+                    temp.click()
+                    cogerDatos()
+                    pageDoing +=1 
+                    print "       .....scraping pagina no. %s......      " % pageDoing
+                else :
+                    print "... too many pages ... moving to next empresa..."
+                    proximaPaginaBool = 1
             except :
                 print "... no hay mas paginas ...."
                 proximaPaginaBool = 1   
 
         
-        time.sleep(wait)
         return(resultados)
         
     except:
         print('Ha ocurrido un error con la busqueda de '+key)
         print("Unexpected error:", sys.exc_info()[0])
-        time.sleep(2)
-        
+        return(resultados)
         
         
 #############################################################################
@@ -313,7 +315,7 @@ def tiraElPais(vinculo) :
         time.sleep(2)
         text = driver.find_elements_by_tag_name("p")
         textL = [a.text for a in text]
-        return(" ".join(filter(None, textL)))
+        return(" ".join(filter(None, textL[0:-2])))
     except :
         return("no hay texto disponible")
     
@@ -328,7 +330,7 @@ def tiraElMundo(vinculo) :
         time.sleep(2)
         text = driver.find_elements_by_tag_name("p")
         textL = [a.text for a in text]
-        return(" ".join(filter(None, textL)))
+        return(" ".join(filter(None, textL[0:-2])))
     except :
         return("no hay texto disponible")
 #############################################################################
@@ -341,7 +343,7 @@ def tiraExpansion(vinculo) :
         time.sleep(2)
         text = driver.find_elements_by_tag_name("p")
         textL = [a.text for a in text]
-        return(" ".join(filter(None, textL)))
+        return(" ".join(filter(None, textL[0:-2])))
     except :
         return("no hay texto disponible")
         

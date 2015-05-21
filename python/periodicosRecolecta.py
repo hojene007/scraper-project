@@ -142,67 +142,72 @@ paraActualisarElPais = {} # un diccionario temporario
 
 noms = list(nombres_fechas['nom_limpios'])
 ind = 0
-cadaN_updateDB = 10
+cadaN_updateDB = 5
 N = len(noms)
 indexError = 0
+
 for nom in noms :
-    while indexError > -1 :
-        indexError +=1
-    
-        expansionTemp = ExpansionTP2(nom, wait=2)
-        print "...........Yendo a Expansion............"
-        for link in expansionTemp :
-            index = expansionTemp.index(link)
-            print ".... cogiendo noticia %s de %s .....Expansion" % (index, len(expansionTemp))
-            if index != 0 and index%100 == 0:
-                driver.quit()
-                driver = webdriver.Chrome()
-            expansionTemp[index]["texto"] = tiraExpansion(expansionTemp[index]["link"])
-            
-            
-            
-        elmundoTemp = ElMundoTP2(nom, wait=2)
-        print "...........Yendo a El Mundo............"
-        for link in elmundoTemp :
-            index = elmundoTemp.index(link)
-            print ".... cogiendo noticia %s de %s .....El Mundo" % (index, len(elmundoTemp))
-            if index != 0 and index%100 == 0:
-                driver.quit()
-                driver = webdriver.Chrome()
-            elmundoTemp[index]["texto"] = tiraElMundo(elmundoTemp[index]["link"]) # seguiendo a cada vinculo
-            
-            
-           
-        elpaisTemp = ElPaisTP2(nom, wait =2) # variables temopranias que contenen la busqueda en cada periodoco empresa se llama "nom"
-        print "...........Yendo a El Pais............"
-        for link in elpaisTemp :
-            index = elpaisTemp.index(link)
-            print ".... cogiendo noticia %s de %s .....El Pais" % (index, len(elpaisTemp))
-            if index != 0 and index%100 == 0:
-                driver.quit()
-                driver = webdriver.Chrome()
-            elpaisTemp[index]["texto"] = tiraElPais(elpaisTemp[index]["link"]) 
-        
-        
-        dictExpansion[nom.decode("utf-8")] = expansionTemp
-        dictElMundo[nom.decode("utf-8")] = elmundoTemp
-        dictElPais[nom.decode("utf-8")] = elmundoTemp
-        
-        paraActualisarExpansion[nom.decode("utf-8")] = expansionTemp
-        paraActualisarElMundo[nom.decode("utf-8")] = elmundoTemp
-        paraActualisarElPais[nom.decode("utf-8")] = elmundoTemp
-        
-        print "he terminado yendo a yahoo para sacar info sobre empresa # %s de %s " % (ind, N)
-        if ind >0 and ind%cadaN_updateDB==0 :
-            updateDBPeriodicosGrandes("expansion", paraActualisarExpansion, insertString)
-            updateDBPeriodicosGrandes("elmundo", paraActualisarElMundo, insertString)
-            updateDBPeriodicosGrandes("elpais", paraActualisarElPais, insertString)
-            paraActualisarExpansion = {}
-            paraActualisarElMundo = {}
-            paraActualisarElPais = {}
-        ind +=1
 
+    indexError +=1
+    print "... saltando empresa numero %s .... " % indexError
+    if noms.index(nom) > 65 :         
+            expansionTemp = ExpansionTP2(nom, wait=2)
+            print "...........Yendo a Expansion............"
+            if len(expansionTemp) > 0 :
+                for link in expansionTemp :
+                    index = expansionTemp.index(link)
+                    print ".... cogiendo noticia %s de %s .....Expansion" % (index, len(expansionTemp))
+                    if index != 0 and index%30 == 0:
+                        driver.quit()
+                        driver = webdriver.Chrome()
+                    expansionTemp[index]["texto"] = tiraExpansion(expansionTemp[index]["link"])
+                
+                
+                
+            elmundoTemp = ElMundoTP2(nom, wait=2)
+            print "...........Yendo a El Mundo............"
+            if len(elmundoTemp)> 0 :
+                for link in elmundoTemp :
+                    index = elmundoTemp.index(link)
+                    print ".... cogiendo noticia %s de %s .....El Mundo" % (index, len(elmundoTemp))
+                    if index != 0 and index%30 == 0:
+                        driver.quit()
+                        driver = webdriver.Chrome()
+                    elmundoTemp[index]["texto"] = tiraElMundo(elmundoTemp[index]["link"]) # seguiendo a cada vinculo
+                
+                
+               
+            elpaisTemp = ElPaisTP2(nom, wait =2) # variables temopranias que contenen la busqueda en cada periodoco empresa se llama "nom"
+            print "...........Yendo a El Pais............"
+            if len(elpaisTemp) > 0 :
+                for link in elpaisTemp :
+                    index = elpaisTemp.index(link)
+                    print ".... cogiendo noticia %s de %s .....El Pais" % (index, len(elpaisTemp))
+                    if index != 0 and index%30 == 0:
+                        driver.quit()
+                        driver = webdriver.Chrome()
+                    elpaisTemp[index]["texto"] = tiraElPais(elpaisTemp[index]["link"]) 
+            
+            
+            dictExpansion[nom.decode("utf-8")] = expansionTemp
+            dictElMundo[nom.decode("utf-8")] = elmundoTemp
+            dictElPais[nom.decode("utf-8")] = elmundoTemp
+            
+            paraActualisarExpansion[nom.decode("utf-8")] = expansionTemp
+            paraActualisarElMundo[nom.decode("utf-8")] = elmundoTemp
+            paraActualisarElPais[nom.decode("utf-8")] = elmundoTemp
+            
+            print "he terminado yendo a yahoo para sacar info sobre empresa # %s de %s " % (ind, N)
+            if ind >0 and ind%cadaN_updateDB==0 :
+                updateDBPeriodicosGrandes("expansion", paraActualisarExpansion, insertString)
+                updateDBPeriodicosGrandes("elmundo", paraActualisarElMundo, insertString)
+                updateDBPeriodicosGrandes("elpais", paraActualisarElPais, insertString)
+                paraActualisarExpansion = {}
+                paraActualisarElMundo = {}
+                paraActualisarElPais = {}
+            ind +=1
 
+# finished at 67
     
     
     
