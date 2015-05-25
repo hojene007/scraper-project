@@ -54,29 +54,33 @@ def ElPaisTP2(key, wait=0):
     
     # go to the google home page
     driver.get("http://elpais.com/buscador/")
-
+    resultados = []
     # find the element that's name attribute is q (the google search box)
     try :
-        element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.ID, "formulario_busquedas")))
+        element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'formulario_busquedas')))
         form = element
     except :
-        print "hay alguno terible en tu codigo......EL Pais"
+        print "hay alguno terible en tu codigo...... al final no tenemos nada sobre esta empresa..EL Pais"
+        return(resultados)
 
     #form = driver.find_element_by_id('formulario_busquedas')
     inputElement = form.find_element_by_name('qt')
     # type in the search
-    inputElement.send_keys(key)
+    
+    try :
+        inputElement.send_keys(key)
+    except UnicodeDecodeError : 
+        inputElement.send_keys(key.decode("utf-8"))
     # submit the form (although google automatically searches now without submitting)
     inputElement.submit()
-    resultados = []
+    
     proximaPaginaBool = 0   
     pageDoing = 1
     
     def cogerDatos() :
         element = WebDriverWait(driver, wait*2).until(
         EC.presence_of_element_located((By.CLASS_NAME, "article")))        #Nos movemos a lo largo de todos los resultados de la búsqueda extrayendo la info 
-        for res in element:
+        for res in driver.find_elements_by_class_name('article'):
             try :
                 noticia = {}
                 titulo = res.find_element_by_css_selector('div.noticia h2 a').text
@@ -106,19 +110,32 @@ def ElPaisTP2(key, wait=0):
                     temp2[0].click()
                     cogerDatos()
                     pageDoing +=1 
-                    print "       .....scraping pagina no. %s......      " % pageDoing
+                    print """       
+                    
+                    .....scraping pagina no. %s......      """ % pageDoing
                 else :
-                    print "no hay mas paginas con resultado ... or ... too many pages ... moving to next empresa..."
+                    print """
+                    
+                    no hay mas paginas con resultados ... or ... demasiado paginas ... movando a la proxima empresa...
+                    
+                    """
                     proximaPaginaBool = 1
             except :
-                print ("no hay mas paginas con resultados", sys.exc_info()[0])
+                print ("""
+                
+                no hay mas paginas con resultados
+                
+                """, sys.exc_info()[0])
                 proximaPaginaBool = 1
         
         return(resultados)
     
     except:
-        print('Ha ocurrido un error con la busqueda de '+key)
-        print("Unexpected error:", sys.exc_info()[0])
+        print('''
+        Ha ocurrido un error con la busqueda de  
+        
+        '''+key)
+        print("Unexpected error:", sys.exc_info()[1])
         return(resultados)
         
 
@@ -128,24 +145,31 @@ def ElPaisTP2(key, wait=0):
         
         
 def ElMundoTP2(key, wait=0):
-    
+    resultados = []
     # go to the google home page
     driver.get("http://ariadna.elmundo.es/buscador/archivo.html")
     # find the element that's name attribute is q (the google search box)
     #form = driver.find_element_by_id('formulario_busquedas')
     try :
-        element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.NAME, "q")))
+        element = WebDriverWait(driver, 15).until(
+        EC.presence_of_element_located((By.NAME, 'q')))
         inputElement = element
     except :
-        print "hay alguno terible en tu codigo......"
-
+        print """
+        
+        hay alguno terible en tu codigo...... al final no tenemos nada sobre esta empresa... el mundo
+        
+        
+        """
+        return(resultados)
         
     # type in the search
-    inputElement.send_keys(key)
+    try :
+        inputElement.send_keys(key)
+    except UnicodeDecodeError :
+        inputElement.send_keys(key.decode("utf-8"))
     # submit the form (although google automatically searches now without submitting)
     inputElement.submit()
-    resultados = []
     proximaPaginaBool = 0   
     pageDoing = 1
     
@@ -153,7 +177,7 @@ def ElMundoTP2(key, wait=0):
         element = WebDriverWait(driver, wait*2).until(
         EC.presence_of_element_located((By.CLASS_NAME, "lista_resultados")))
         #Nos movemos a lo largo de todos los resultados de la búsqueda extrayendo la info 
-        busc = element
+        busc = driver.find_element_by_class_name('lista_resultados')        
         for res in busc.find_elements_by_css_selector('li'):
             try :
                 noticia = {}
@@ -175,38 +199,62 @@ def ElMundoTP2(key, wait=0):
                 noticia['fecha'] =fecha
                 noticia['parrafo'] =parrafo
                 resultados.append(noticia)
-                print ".... anexo resultad con titulo:.... %s      ....." % titulo
+                print """
+                
+                .... anexo resultad con titulo:.... %s      .....""" % titulo
             except :
-                print("Potentially no results", sys.exc_info()[0])
+                print("""
+                
+                Potentially no results...
+                
+                """, sys.exc_info()[0])
 
     try : 
         cogerDatos()
-        print "tried once"
         while proximaPaginaBool == 0 :
             try:
                 element = WebDriverWait(driver, wait*2).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "nav_resultados")))
+                EC.presence_of_element_located((By.CLASS_NAME, 'nav_resultados')))
                 temp = element # verificando si hay mas que una pagina
                 temp2 = temp.find_elements_by_tag_name("a")
                 temp3 = temp2[-1].text
                 if temp3.encode("utf-8") == 'Siguiente \xc2\xbb' and pageDoing<7:
                     temp2[-1].click()
-                    print "clicking"
                 else :
-                    print "no hay mas paginas con resultados... o no quieremos mas que 15 paginas de resultados"
+                    print """
+                    
+                    no hay mas paginas con resultados... o no quieremos mas que 7 paginas de resultados
+                    
+                    """
                     proximaPaginaBool = 1
                     
                 cogerDatos()
                 pageDoing +=1 
-                print "       .....scraping pagina no. %s......      " % pageDoing
+                print """     
+                
+                .....scraping pagina no. %s......     
+                
+                """ % pageDoing
             except :
-                print "no hay mas paginas con resultados"
+                print """
+                
+                no hay mas paginas con resultados
+                
+                """
                 proximaPaginaBool = 1
         print proximaPaginaBool    
         return(resultados)
     except :
-        print('Ha ocurrido un error con la busqueda de '+key)
-        print("Unexpected error:", sys.exc_info()[0])
+        print('''
+        
+        Ha ocurrido un error con la busqueda de 
+        
+        '''+key)
+        print("""
+        
+        Unexpected error:
+        
+        """, sys.exc_info()[0])
         return(resultados)
 
         
@@ -217,23 +265,32 @@ def ElMundoTP2(key, wait=0):
 def ExpansionTP2(key, wait=2) :
         # go to the google home page
     driver.get("http://www.expansion.com")
+    resultados = []
+
     # find the element that's name attribute is q (the google search box)
 
     try :
         element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.ID, "buscar")))
-        inputElement = element
+        EC.presence_of_element_located((By.ID, 'buscar')))
+        inputElement =  driver.find_element_by_id("buscar")
     except :
-        print "hay alguno terible en tu codigo......"
-        inputElement = driver.find_element_by_id("buscar")
+        print """
+        
+        hay alguno terible en tu codigo...al final no tenemos nada sobre esta empresa... expansion
+        
+        """
+        return(resultados)
 
         
     # type in the search
-    inputElement.send_keys(key)
+    try :
+        inputElement.send_keys(key)
+    except UnicodeDecodeError :
+        inputElement.send_keys(key.decode("utf-8"))
+        
     # submit the form (although google automatically searches now without submitting)
     inputElement.submit()
     time.sleep(wait) # <----  no se funciona sin esto
-    resultados = []
     proximaPaginaBool = 0   
     pageDoing = 1
     
@@ -254,7 +311,11 @@ def ExpansionTP2(key, wait=2) :
                 noticia['parrafo']=parrafo
                 resultados.append(noticia)
         except :
-            print ("why you no give me no love baby.... Expansion", sys.exc_info()[0])
+            print ("""
+            
+            why you no give me no love baby.... Expansion
+            
+            """, sys.exc_info()[0])
         
     try:
         #Nos movemos a lo largo de todos los resultados de la búsqueda extrayendo la info 
@@ -267,20 +328,38 @@ def ExpansionTP2(key, wait=2) :
                     temp.click()
                     cogerDatos()
                     pageDoing +=1 
-                    print "       .....scraping pagina no. %s......      " % pageDoing
+                    print """  
+                    
+                    .....scraping pagina no. %s......   
+                    
+                    """ % pageDoing
                 else :
-                    print "... too many pages ... moving to next empresa..."
+                    print """
+                    
+                    ... too many pages ... moving to next empresa...
+                    
+                    """
                     proximaPaginaBool = 1
             except :
-                print "... no hay mas paginas ...."
+                print """
+                
+                ... no hay mas paginas ....
+                
+                """
                 proximaPaginaBool = 1   
 
         
         return(resultados)
         
     except:
-        print('Ha ocurrido un error con la busqueda de '+key)
-        print("Unexpected error:", sys.exc_info()[0])
+        print('''
+        
+        Ha ocurrido un error con la busqueda de '''+key)
+        print("""
+        
+        Unexpected error:
+        
+        """, sys.exc_info()[0])
         return(resultados)
         
         

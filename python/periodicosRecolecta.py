@@ -16,6 +16,14 @@ import sys
 import os
 from selenium import webdriver
 import pandas as pd
+#os.system("taskkill /im chrome.exe")
+
+import sys  
+
+
+#reload(sys)  
+#sys.setdefaultencoding('utf-8')
+
 
 os.chdir("C:\\Users\\bluecap\\Desktop\\bluecap\\project\\scrapper\\python")
 badTerms = ["SL", "SA", "S.L.", "SOCIEDAD", "ANONIMA", "LIMITADA", "SCCL"]
@@ -45,6 +53,7 @@ dbname = "einformaDB"#
 
 db = MySQLdb.connect(host, user, password, dbname)
 cursor = db.cursor()
+
 
 # creiando la tabla con bing cosas 3
 #cursor.execute("DROP TABLE IF EXISTS einformaDB.bingNoticias;")
@@ -104,13 +113,15 @@ for nom in noms :
 #############################################################################  
     
 ############### Attacando periodicos españoles
-queryConcurso = "SELECT * FROM einformaDB.Empresas where situacion like '%Concurso%' and situacion like '%CONCURSO%';"
-dropIfthere = "DROP TABLE IF EXISTS einformaDB.PeriodicosGrandes;"
-nuevaTabla = """CREATE TABLE einformaDB.PeriodicosGrandes
+""""""
+
+#queryConcurso = "SELECT * FROM einformaDB.Empresas where situacion like '%Concurso%' and situacion like '%CONCURSO%';"
+dropIfthere = "DROP TABLE IF EXISTS einformaDB.PeriodicosGrandes4;"
+nuevaTabla = """CREATE TABLE einformaDB.PeriodicosGrandes4
 (
 fuenta text,
 empresa text,
-fecha datetime,
+fecha text,
 autor text,
 link text, 
 parrafo text, 
@@ -119,9 +130,10 @@ texto text
 );"""
 cursor.execute(dropIfthere)
 cursor.execute(nuevaTabla)
-insertString = "INSERT INTO einformaDB.PeriodicosGrandes (fuenta, empresa, fecha, autor, link, parrafo, titulo, texto)  values (%s, %s, %s, %s, %s, %s, %s, %s);"
 
+insertString = "INSERT INTO einformaDB.PeriodicosGrandes3 (fuenta, empresa, fecha, autor, link, parrafo, titulo, texto)  values (%s, %s, %s, %s, %s, %s, %s, %s);"
 
+"""
 def updateDBPeriodicosGrandes(fuenta, empresaDict, baseString) :
     # se hace updating MYSQL DB 
     for nom in empresaDict:
@@ -131,6 +143,15 @@ def updateDBPeriodicosGrandes(fuenta, empresaDict, baseString) :
                 print "Se actualizo empresa '%s' y articulo se llama '%s' " % (nom.encode("utf-8"), tempDF.iloc[5, 1].encode("utf-8"))
                 cursor.execute(baseString, (fuenta, tempDF.iloc[0, 1].encode("utf-8"), tempDF.iloc[1, 1].encode("utf-8"), tempDF.iloc[2, 1].encode("utf-8"), tempDF.iloc[3, 1].encode("utf-8"), tempDF.iloc[4, 1].encode("utf-8"), tempDF.iloc[5, 1].encode("utf-8"),  tempDF.iloc[6, 1].encode("utf-8"))) 
                 db.commit()
+"""
+def updateDBPeriodicosGrandes2(fuenta, empresaDict, baseString) :
+    for nom in empresaDict:
+        if len(empresaDict) > 0:
+            for articulo in empresaDict[nom] :    
+                print "Actualizo empresa %s  y articulo con titulo %s " % (unicode(articulo["Empresa"], "utf-8").encode("utf-8"), articulo["titulo"].encode("utf-8"))
+                cursor.execute(baseString, (fuenta, unicode(articulo["Empresa"], "utf-8").encode("utf-8"), articulo["fecha"].encode("utf-8"), articulo["autor"].encode("utf-8"), articulo["link"].encode("utf-8"), articulo["parrafo"].encode("utf-8"), articulo["titulo"].encode("utf-8"), articulo["texto"].encode("utf-8")))
+                db.commit()
+
 
 dictElPais = {}
 dictElMundo = {}
@@ -141,50 +162,50 @@ paraActualisarElMundo = {}
 paraActualisarElPais = {} # un diccionario temporario
 
 noms = list(nombres_fechas['nom_limpios'])
-ind = 0
+ind = 96
 cadaN_updateDB = 5
 N = len(noms)
 indexError = 0
 
 for nom in noms :
-
-    indexError +=1
-    print "... saltando empresa numero %s .... " % indexError
-    if noms.index(nom) > 65 :         
-            expansionTemp = ExpansionTP2(nom, wait=2)
+    # para bigNoticias3 acabadó a 280
+    if noms.index(nom) > 94 :     
+            ind= noms.index(nom)
             print "...........Yendo a Expansion............"
+            expansionTemp = ExpansionTP2(nom, wait=2)
             if len(expansionTemp) > 0 :
                 for link in expansionTemp :
                     index = expansionTemp.index(link)
                     print ".... cogiendo noticia %s de %s .....Expansion" % (index, len(expansionTemp))
                     if index != 0 and index%30 == 0:
                         driver.quit()
+                        os.system("taskkill /im chrome.exe")
                         driver = webdriver.Chrome()
                     expansionTemp[index]["texto"] = tiraExpansion(expansionTemp[index]["link"])
                 
                 
-                
-            elmundoTemp = ElMundoTP2(nom, wait=2)
             print "...........Yendo a El Mundo............"
+            elmundoTemp = ElMundoTP2(nom, wait=2)
             if len(elmundoTemp)> 0 :
                 for link in elmundoTemp :
                     index = elmundoTemp.index(link)
                     print ".... cogiendo noticia %s de %s .....El Mundo" % (index, len(elmundoTemp))
                     if index != 0 and index%30 == 0:
                         driver.quit()
+                        os.system("taskkill /im chrome.exe")
                         driver = webdriver.Chrome()
                     elmundoTemp[index]["texto"] = tiraElMundo(elmundoTemp[index]["link"]) # seguiendo a cada vinculo
                 
                 
-               
+            print "...........Yendo a El Pais............"   
             elpaisTemp = ElPaisTP2(nom, wait =2) # variables temopranias que contenen la busqueda en cada periodoco empresa se llama "nom"
-            print "...........Yendo a El Pais............"
             if len(elpaisTemp) > 0 :
                 for link in elpaisTemp :
                     index = elpaisTemp.index(link)
                     print ".... cogiendo noticia %s de %s .....El Pais" % (index, len(elpaisTemp))
                     if index != 0 and index%30 == 0:
                         driver.quit()
+                        #os.system("taskkill /im chrome.exe") # limpiando los procesos para no se paran chrome 
                         driver = webdriver.Chrome()
                     elpaisTemp[index]["texto"] = tiraElPais(elpaisTemp[index]["link"]) 
             
@@ -199,15 +220,14 @@ for nom in noms :
             
             print "he terminado yendo a yahoo para sacar info sobre empresa # %s de %s " % (ind, N)
             if ind >0 and ind%cadaN_updateDB==0 :
-                updateDBPeriodicosGrandes("expansion", paraActualisarExpansion, insertString)
-                updateDBPeriodicosGrandes("elmundo", paraActualisarElMundo, insertString)
-                updateDBPeriodicosGrandes("elpais", paraActualisarElPais, insertString)
+                updateDBPeriodicosGrandes2("expansion", paraActualisarExpansion, insertString)
+                updateDBPeriodicosGrandes2("elmundo", paraActualisarElMundo, insertString)
+                updateDBPeriodicosGrandes2("elpais", paraActualisarElPais, insertString)
                 paraActualisarExpansion = {}
                 paraActualisarElMundo = {}
                 paraActualisarElPais = {}
             ind +=1
 
 # finished at 67
-    
     
     
