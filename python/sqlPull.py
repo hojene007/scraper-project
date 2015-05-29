@@ -64,7 +64,7 @@ nombres_fechas = nombres_fechas[['nom_limpios', 'fecha_concurso']]
 
 
 ###################################
-queryNoticias = "SELECT * FROM einformaDB.PeriodicosGrandes3 group by link;"
+queryNoticias = "SELECT * FROM einformaDB.PeriodicosGrandes4 group by link;"
 noticiasDF = pd.read_sql(queryNoticias, db)
 
 type(noticiasDF.iloc[0, 2])
@@ -116,4 +116,27 @@ articulos_relevantes2.iloc[5, 1]
 articulos_relevantes2.iloc[5, 7].decode("utf-8")
 
 
-     
+#############################
+""" arreglando links con archivo. ... no se funcionan bien ahora"""
+#############################
+dictElMundoN = {}
+dictElPaisN = {}
+dictExpansionN = {}
+
+queryNoticias = "SELECT * FROM einformaDB.PeriodicosGrandes4 group by link;"
+df = pd.read_sql(queryNoticias, db)
+
+for empr in dictElMundo :
+    dictElMundoN[empr] = dictElMundo[empr]
+    if len(dictElMundo[empr]) > 0 :
+        for link in dictElMundo[empr] :
+            link = dictElMundo[empr]["link"]
+            textToReplace = tiraElMundo(link)
+            dictElMundoN[empr]["texto"] = textToReplace
+            
+maxL = 0
+for empr in dictExpansion :
+    length = len(dictExpansion[empr]) 
+    if maxL < length :
+        maxL = length
+print maxL            

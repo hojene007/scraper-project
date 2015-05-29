@@ -23,7 +23,7 @@ from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 binary = FirefoxBinary('C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe')
 driver = webdriver.Firefox(firefox_binary=binary)
 """
-driver = webdriver.Chrome()
+#driver = webdriver.Chrome()
 
 
 #############################################################################
@@ -394,7 +394,7 @@ def tiraElPais(vinculo) :
         time.sleep(2)
         text = driver.find_elements_by_tag_name("p")
         textL = [a.text for a in text]
-        return(" ".join(filter(None, textL[0:-2])))
+        return " ".join(filter(None, list(set(textL))))
     except :
         return("no hay texto disponible")
     
@@ -409,7 +409,7 @@ def tiraElMundo(vinculo) :
         time.sleep(2)
         text = driver.find_elements_by_tag_name("p")
         textL = [a.text for a in text]
-        return(" ".join(filter(None, textL[0:-2])))
+        return " ".join(filter(None, list(set(textL))))
     except :
         return("no hay texto disponible")
 #############################################################################
@@ -422,7 +422,7 @@ def tiraExpansion(vinculo) :
         time.sleep(2)
         text = driver.find_elements_by_tag_name("p")
         textL = [a.text for a in text]
-        return(" ".join(filter(None, textL[0:-2])))
+        return " ".join(filter(None, list(set(textL))))
     except :
         return("no hay texto disponible")
         
@@ -436,4 +436,7 @@ driver.get("http://economia.elpais.com/economia/2012/09/01/actualidad/1346529488
 temp = driver.find_elements_by_tag_name("p")
 textL = [a.text for a in temp]
 str_list = filter(None, textL)
+
 """
+
+
