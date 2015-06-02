@@ -170,7 +170,7 @@ indexError = 0
 try :
     for nom in noms :
         # para bigNoticias3 acabadó a 280
-        if noms.index(nom) > 900 and noms.index(nom) < 1200 :     
+        if noms.index(nom) > -1 and noms.index(nom) < 1302:     
                 ind= noms.index(nom)
                 
                 
@@ -290,8 +290,131 @@ try :
                     paraActualisarExpansion = {}
                     paraActualisarElMundo = {}
                     paraActualisarElPais = {}
-                ind +=1
-except KeyboardInterrupt: 
+except WebDriverException :
+      for nom in noms :
+        # para bigNoticias3 acabadó a 280
+        if noms.index(nom) > ind :     
+                ind= noms.index(nom)
+                
+                
+                print "...........Yendo a Expansion............"
+                
+                
+                try :
+                    expansionTemp = ExpansionTP2("'"+nom+"'", wait=2)
+                    if len(expansionTemp) > 0 :
+                        for link in expansionTemp :
+                            index = expansionTemp.index(link)
+                            print ".... cogiendo noticia %s de %s .....Expansion" % (index, len(expansionTemp))
+                            if index != 0 and index%30 == 0:
+                                driver.quit()
+                                #os.system("taskkill /im chrome.exe")
+                                driver = webdriver.Chrome()
+                            link["texto"] = tiraExpansion(link["link"])
+                except :
+                    driver = webdriver.Chrome()
+                    expansionTemp = ExpansionTP2("'"+nom+"'", wait=2)
+                    if len(expansionTemp) > 0 :
+                        for link in expansionTemp :
+                            index = expansionTemp.index(link)
+                            print ".... cogiendo noticia %s de %s .....Expansion" % (index, len(expansionTemp))
+                            if index != 0 and index%30 == 0:
+                                driver.quit()
+                                #os.system("taskkill /im chrome.exe")
+                                driver = webdriver.Chrome()
+                            link["texto"] = tiraExpansion(link["link"])
+                            
+                            
+                    
+                print "...........Yendo a El Mundo............"
+                
+                
+                
+                try :
+                    elmundoTemp = ElMundoTP2("'"+nom+"'", wait=2)
+                    if len(elmundoTemp)> 0 :
+                        for link in elmundoTemp :
+                            index = elmundoTemp.index(link)
+                            print ".... cogiendo noticia %s de %s .....El Mundo" % (index, len(elmundoTemp))
+                            if index != 0 and index%30 == 0:
+                                driver.quit()
+                               # os.system("taskkill /im chrome.exe")
+                                driver = webdriver.Chrome()
+                            link["texto"] = tiraElMundo(link["link"]) # seguiendo a cada vinculo
+                except :
+                    driver = webdriver.Chrome()
+                    elmundoTemp = ElMundoTP2("'"+nom+"'", wait=2)
+                    if len(elmundoTemp)> 0 :
+                        for link in elmundoTemp :
+                            index = elmundoTemp.index(link)
+                            print ".... cogiendo noticia %s de %s .....El Mundo" % (index, len(elmundoTemp))
+                            if index != 0 and index%30 == 0:
+                                driver.quit()
+                                #os.system("taskkill /im chrome.exe")
+                                driver = webdriver.Chrome()
+                            link["texto"] = tiraElMundo(link["link"]) # seguiendo a cada vinculo
+                            
+                            
+                    
+                print "...........Yendo a El Pais............"   
+                
+                
+                try :
+                    elpaisTemp = ElPaisTP2("'"+nom+"'", wait =2) # variables temopranias que contenen la busqueda en cada periodoco empresa se llama "nom"
+                    if len(elpaisTemp) > 0 :
+                        for link in elpaisTemp :
+                            index = elpaisTemp.index(link)
+                            print ".... cogiendo noticia %s de %s .....El Pais" % (index, len(elpaisTemp))
+                            if index != 0 and index%30 == 0:
+                                driver.quit()
+                                os.system("taskkill /im chrome.exe") # limpiando los procesos para no se paran chrome 
+                                driver = webdriver.Chrome()
+                            link["texto"] = tiraElPais(link["link"]) 
+                except :
+                    driver = webdriver.Chrome()
+                    elpaisTemp = ElPaisTP2("'"+nom+"'", wait =2) # variables temopranias que contenen la busqueda en cada periodoco empresa se llama "nom"
+                    if len(elpaisTemp) > 0 :
+                        for link in elpaisTemp :
+                            index = elpaisTemp.index(link)
+                            print ".... cogiendo noticia %s de %s .....El Pais" % (index, len(elpaisTemp))
+                            if index != 0 and index%30 == 0:
+                                driver.quit()
+                                os.system("taskkill /im chrome.exe") # limpiando los procesos para no se paran chrome 
+                                driver = webdriver.Chrome()
+                            link["texto"] = tiraElPais(link["link"]) 
+                            
+                            
+                
+                dictExpansion[nom.decode("utf-8")] = expansionTemp
+                dictElMundo[nom.decode("utf-8")] = elmundoTemp
+                dictElPais[nom.decode("utf-8")] = elpaisTemp
+                
+                
+                
+                paraActualisarExpansion[nom.decode("utf-8")] = expansionTemp
+                paraActualisarElMundo[nom.decode("utf-8")] = elmundoTemp
+                paraActualisarElPais[nom.decode("utf-8")] = elpaisTemp
+                
+                
+                
+                print "he terminado yendo a yahoo para sacar info sobre empresa # %s de %s " % (ind, N)
+                if ind >0 and ind%cadaN_updateDB==0 :
+                    try :
+                        updateDBPeriodicosGrandes2("expansion", paraActualisarExpansion, insertString)
+                        updateDBPeriodicosGrandes2("elmundo", paraActualisarElMundo, insertString)
+                        updateDBPeriodicosGrandes2("elpais", paraActualisarElPais, insertString)
+                    except :
+                        db = MySQLdb.connect(host, user, password, dbname)
+                        cursor = db.cursor()
+                        updateDBPeriodicosGrandes2("expansion", paraActualisarExpansion, insertString)
+                        updateDBPeriodicosGrandes2("elmundo", paraActualisarElMundo, insertString)
+                        updateDBPeriodicosGrandes2("elpais", paraActualisarElPais, insertString)
+                        
+                    paraActualisarExpansion = {}
+                    paraActualisarElMundo = {}
+                    paraActualisarElPais = {}
+    
+except KeyboardInterrupt : 
     print "Master says stop!"
 
 # finished at 67

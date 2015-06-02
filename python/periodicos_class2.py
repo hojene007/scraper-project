@@ -16,7 +16,7 @@ import sys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException, WebDriverException
 
 """
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
@@ -395,6 +395,13 @@ def tiraElPais(vinculo) :
         text = driver.find_elements_by_tag_name("p")
         textL = [a.text for a in text]
         return " ".join(filter(None, list(set(textL))))
+    except WebDriverException :
+        driver = webdriver.Chrome()
+        driver.get(vinculo)
+        time.sleep(2)
+        text = driver.find_elements_by_tag_name("p")
+        textL = [a.text for a in text]
+        return " ".join(filter(None, list(set(textL))))
     except :
         return("no hay texto disponible")
     
@@ -410,6 +417,13 @@ def tiraElMundo(vinculo) :
         text = driver.find_elements_by_tag_name("p")
         textL = [a.text for a in text]
         return " ".join(filter(None, list(set(textL))))
+    except WebDriverException :
+        driver = webdriver.Chrome()
+        driver.get(vinculo)
+        time.sleep(2)
+        text = driver.find_elements_by_tag_name("p")
+        textL = [a.text for a in text]
+        return " ".join(filter(None, list(set(textL))))
     except :
         return("no hay texto disponible")
 #############################################################################
@@ -418,6 +432,13 @@ def tiraElMundo(vinculo) :
     
 def tiraExpansion(vinculo) :
     try :
+        driver.get(vinculo)
+        time.sleep(2)
+        text = driver.find_elements_by_tag_name("p")
+        textL = [a.text for a in text]
+        return " ".join(filter(None, list(set(textL))))
+    except WebDriverException :
+        driver = webdriver.Chrome()
         driver.get(vinculo)
         time.sleep(2)
         text = driver.find_elements_by_tag_name("p")
