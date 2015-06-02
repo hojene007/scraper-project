@@ -21,11 +21,11 @@ from __future__ import division
 from sklearn import lda
 from nltk.stem.snowball import SnowballStemmer
 
-print(SnowballStemmer("spanish").stem(unicode("maravilló", "utf8"))
+#print(SnowballStemmer("spanish").stem(unicode("maravilló", "utf8"))
 
 
 #nltk.download()
-os.chdir("C:\\Users\\Epoch\\Documents\\GitHub\\scraper-project\\documents")
+os.chdir("C:\\Users\\bluecap\\Documents\\GitHub\\scraper-project\\documents")
 
 stopW1 = open("stopWEsp.txt")
 spanish_tokenizer = nltk.data.load('tokenizers/punkt/spanish.pickle')
@@ -78,21 +78,6 @@ for i in range(0, dfConKeywords.shape[0]) :
     dictConKeyWords[dfConKeywords.iloc[i, -1]] = " ".join(listKeyWords)
 
 
-"""
-def stopword_remove(stopWord, tokensList):
-
-        """"""
-        Remove stopwords from tokens.
-        """"""
-        with codecs.open(stopWord,'r') as f: raw = f.read()
-        stopwords = set(raw.splitlines())
-        def remove(tokens): 
-            notIn = [t for t in tokens if t not in stopwords]
-            return notIn
-        #tokens = map(remove, tokensList
-        tokens = remove(tokensList)
-        return tokens
-"""        
 
 textData = list(articulos_relevantes2['texto'])
 textDataMerged = [unicode(a, "utf-8") for a in textData]
@@ -107,7 +92,7 @@ for empr in dictConKeyWords :
     dictConKeyWords2[empr] = tok
 
 
-def relevanceMeter(docTokens, dictionary):
+def relevanceMeter1(docTokens, dictionary):
     # conta cuanto vezes los terminos en diccionario apparecen en texto
     elemsIn = [elem for elem in dictionary if elem in docTokens]
     n = len(elemsIn)
@@ -117,10 +102,24 @@ def relevanceMeter(docTokens, dictionary):
         relevance = 0
     return (relevance)  
 
-a = ["a", "b", "c"]
-b = ["b", "c", "d"]
+def relevanceMeter2(docTokens, dictionary):
+    # conta cuanto vezes los terminos en diccionario apparecen en texto - conta mas que un tiempo cada palabra si esta en el texto mas que un vez
+    elemsIn = [docTokens.count(elem) for elem in dictionary]
+    n = sum(elemsIn)
+    if n> 0:
+        relevance = n/len(dictionary)
 
-relevanceMeter(a, b)
+    else :
+        relevance = 0
+
+    return (relevance)    
+
+
+a = ["a", "b", "c"]
+b = ["b", "b", "d"]
+
+relevanceMeter2(a, b)
+
 articulos_relevantes2["relevance"] = np.nan
 relevanceList = []
 for articulo in range(0, articulos_relevantes2.shape[0]) :
@@ -131,7 +130,7 @@ for articulo in range(0, articulos_relevantes2.shape[0]) :
     cleanTokens = rawDocs.tokens
     nombreEmpresa = articulos_relevantes2.iloc[articulo, 1]
     try :
-        rel = relevanceMeter(cleanTokens, descripcion)
+        rel = relevanceMeter1(cleanTokens, descripcion)
         descripcion = dictConKeyWords2[nombreEmpresa]
         relevanceList.append(rel)
         articulos_relevantes2.iloc[articulo, 11] = rel
@@ -184,8 +183,13 @@ for empr in dictConKeyWords :
     dictConKeyWords2[empr] = tok    
     
     
-new_noticias_df["relevance"] = np.nan
-relevanceList = []
+new_noticias_df["relevance1"] = np.nan
+new_noticias_df["relevance2"] = np.nan
+
+
+relevanceList1 = []
+relevanceList2 = []
+
 for articulo in range(0, new_noticias_df.shape[0]) :
     text = unicode(new_noticias_df.iloc[articulo, 7], "utf8")
     rawDocs = RawDocsMod1(text, "stopWEsp.txt")
@@ -196,13 +200,17 @@ for articulo in range(0, new_noticias_df.shape[0]) :
     try :
         descripcion = dictConKeyWords2[nombreEmpresa]
         #print descripcion
-        rel = relevanceMeter(cleanTokens, descripcion)
-        relevanceList.append(rel)
-        new_noticias_df.iloc[articulo, 10] = rel
+        rel1 = relevanceMeter1(cleanTokens, descripcion)
+        rel2 = relevanceMeter2(cleanTokens, descripcion)
+        relevanceList1.append(rel1)
+        relevanceList2.append(rel2)
+        new_noticias_df.iloc[articulo, 10] = rel1
+        new_noticias_df.iloc[articulo, 11] = rel2
         print " ++++ encontro empresa %s " % nombreEmpresa
     except :
         print "--- no encontro empresa %s " % nombreEmpresa 
         
 #######################################################################
-        
+        """ LDA ANALISÍS """
 #######################################################################
+        

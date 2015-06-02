@@ -26,26 +26,7 @@ driver = webdriver.Firefox(firefox_binary=binary)
 #driver = webdriver.Chrome()
 
 
-#############################################################################
-"""Tirando titulos, vinculos, etc CLASS """ 
-#############################################################################
-""" Ignoralo
-class wait_for_page_load(object):
 
-    def __init__(self, browser, tag):
-        self.browser = browser
-        self.myTag = tag
-
-    def __enter__(self):
-        self.old_page = self.browser.find_element_by_tag_name(self.myTag)
-
-    def page_has_loaded(self):
-        new_page = self.browser.find_element_by_tag_name(self.myTag)
-        return new_page.id != self.old_page.id
-
-    def __exit__(self, *_):
-        wait_for(self.page_has_loaded)
-"""
 #############################################################################
 """EL PAIS"""
 #############################################################################

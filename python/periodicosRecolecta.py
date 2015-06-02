@@ -72,41 +72,7 @@ nombres_fechas[['fecha_concurso']] = pd.DataFrame(fechas)
 nombres_fechas = nombres_fechas[['nom_limpios', 'fecha_concurso']]
 
 """
-''' Bing SEARCH '''
-"BingNews(keys, wait=0)"
-'''''''''''''''''''' 
-driver = webdriver.Chrome()
 
-insertString = "INSERT INTO einformaDB.bingNoticias (empresa, fecha, autor, link, parrafo, titulo)  values (%s, %s, %s, %s, %s, %s);"
-
-def updateDBBing(empresaDict, baseString) :
-    # se hace updating MYSQL DB 
-    for nom in empresaDict:
-        if len(empresaDict[nom])>0 :
-            for articulo in empresaDict[nom] :
-                tempDF = pd.DataFrame(articulo.items())
-                print "Se actualizo empresa '%s' y articulo se llama '%s' " % (nom.encode("utf-8"), tempDF.iloc[5, 1].encode("utf-8"))
-                cursor.execute(baseString, (tempDF.iloc[0, 1].encode("utf-8"), tempDF.iloc[1, 1].encode("utf-8"), tempDF.iloc[2, 1].encode("utf-8"), tempDF.iloc[3, 1].encode("utf-8"), tempDF.iloc[4, 1].encode("utf-8"), tempDF.iloc[5, 1].encode("utf-8"))) 
-                db.commit()
-
-
-## attacando bing 
-todasEmpresas = {}
-paraActualisarDB = {} # un diccionario temporario
-noms = list(nombres_fechas['nom_limpios'])
-ind = 0
-cadaN_updateDB = 10
-N = len(noms)
-for nom in noms :
-    #if ind > 252 :
-    infoList = BingNews(key=nom.decode("utf-8"), wait=2)
-    todasEmpresas[nom.decode("utf-8")] = infoList
-    paraActualisarDB[nom.decode("utf-8")] = infoList
-    print "he terminado yendo a yahoo para sacar info sobre empresa # %s de %s " % (ind, N)
-    if ind >0 and ind%cadaN_updateDB==0 :
-        updateDBBing(paraActualisarDB, insertString)
-        paraActualisarDB = {}
-    ind +=1
 """    
 #############################################################################
 
@@ -417,11 +383,6 @@ except WebDriverException :
 except KeyboardInterrupt : 
     print "Master says stop!"
 
-# finished at 67
-    
-#updateDBPeriodicosGrandes2("expansion", dictExpansion, insertString)
-#updateDBPeriodicosGrandes2("elmundo", dictElMundo, insertString)
-#updateDBPeriodicosGrandes2("elpais", dictElPais, insertString)    
 
 
 
