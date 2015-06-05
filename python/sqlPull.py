@@ -11,6 +11,7 @@ import MySQLdb
 import string
 import datetime 
 import pandas as pd
+from datetime import datetime
      
 host = "bluecap.cubz34n4knn2.eu-central-1.rds.amazonaws.com"
 user = "bluecap"
@@ -75,8 +76,8 @@ def construirVecFechas(nombres_fechas, df) :
     nombresVec = df["empresa"]
     vec_concurso = []
     for nom in nombresVec :
-        temp = nombres_fechas[nombres_fechas["nom_limpios"] == nom]
-        print temp['fecha_concurso'].values[0]
+        temp = nombres_fechas[nombres_fechas["nom_limpios"].replace("'", "") == nom.replace("'", "")]
+        #print temp['fecha_concurso'].values[0]
         vec_concurso.append(temp['fecha_concurso'].values[0])
     dfNew = df
     dfNew['fecha_de_concurso_de_empresa']= pd.DataFrame(vec_concurso)
@@ -87,6 +88,9 @@ new_noticias_df =construirVecFechas(nombres_fechas, noticiasDF)
 ## Solo donde fecha_concurso > fecha_noticia
 new_noticias_df["fecha"] = pd.to_datetime(new_noticias_df["fecha"])
 new_noticias_df["fecha_de_concurso_de_empresa"] = pd.to_datetime(new_noticias_df["fecha_de_concurso_de_empresa"])
+
+
+############### Hasta aqui para text_mining1.py ################################################################
 
 articulos_relevantes = new_noticias_df[new_noticias_df["fecha"] < new_noticias_df["fecha_de_concurso_de_empresa"]]
 articulos_relevantes["difer_fechas"] = articulos_relevantes["fecha_de_concurso_de_empresa"] - articulos_relevantes["fecha"]

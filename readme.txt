@@ -34,4 +34,4 @@ ARCHIVOS:
   este archivo
 
 
-- all_concurso.spydata - todos las resultados de busqueda en periodocos El Pais, El Mundo y Expansion en un formato que se lee con Python
+- all_concurso.spydata - todos las resultados de busqueda en periodocos El Pais, El Mundo y Expansion en un formato lo que se lee con Python
