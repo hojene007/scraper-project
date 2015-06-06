@@ -18,6 +18,7 @@ from nltk.tokenize import wordpunct_tokenize
 from nltk import PorterStemmer
 import pandas as pd
 import numpy as np
+from nltk.stem.snowball import SnowballStemmer
 
 
           
@@ -199,6 +200,9 @@ class RawDocsMod1():
 
         def remove(tokens): return [t for t in tokens if t not in self.stopwords]
         self.tokens = remove(self.tokens)
+        
+    def non_espanol_remove(self) :
+        
 
 
     def stem(self):
@@ -206,8 +210,8 @@ class RawDocsMod1():
         """
         Stem tokens with Porter Stemmer.
         """
-
-        def s(tokens): return [PorterStemmer().stem(t) for t in tokens]
+        stemmer = SnowballStemmer("spanish")
+        def s(tokens): return [stemmer.stem(t) for t in tokens]
         self.stems = s(self.tokens)
   
     
