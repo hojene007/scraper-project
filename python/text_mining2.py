@@ -40,6 +40,8 @@ import itertools
 import time
 
 
+
+
      
 host = "bluecap.cubz34n4knn2.eu-central-1.rds.amazonaws.com"
 user = "bluecap"
@@ -51,6 +53,20 @@ cursor = db.cursor()
 
 
 ##### Necessary functions ####
+def updateDBPeriodicosGrandes3(noticiasPD, baseString) :
+    for noticia in range(0, noticiasPD.shape[0]) :
+        cursor.execute(baseString, (
+        unicode(noticiasPD.iloc[noticia, 0], "utf8").encode("utf8"), 
+unicode(noticiasPD.iloc[noticia, 1], "utf8").encode("utf-8"), 
+unicode(noticiasPD.iloc[noticia, 2], "utf8").encode("utf-8"), 
+unicode(noticiasPD.iloc[noticia, 3], "utf8").encode("utf-8"), 
+unicode(noticiasPD.iloc[noticia, 4], "utf8").encode("utf-8"), 
+unicode(noticiasPD.iloc[noticia, 5], "utf8").encode("utf-8"), 
+unicode(noticiasPD.iloc[noticia, 6], "utf8").encode("utf-8"), 
+unicode(noticiasPD.iloc[noticia, 7], "utf8").encode("utf8")))
+        db.commit()  
+    
+
 
 def tiraTextoBS(url) :
     response = requests.get(url)
@@ -160,21 +176,26 @@ nombres_fechas = nombres_fechas[['nom_limpios', 'fecha_concurso']]
 ###################################
 queryNoticias = "SELECT * FROM einformaDB.PeriodicosGrandes5 group by link;"
 noticiasDF = pd.read_sql(queryNoticias, db) # has text missing for some reason...
+insertString = "INSERT INTO einformaDB.noticias_concurso_test(fuenta, empresa, fecha, autor, link, parrafo, titulo, texto)  values (%s, %s, %s, %s, %s, %s, %s, %s);"
 
 ### Updating some text
 ind = 0
 for link in noticiasDF["link"] :
+    
     texto = tiraTextoBS(str(link))
     noticiasDF.iloc[ind, 7] = texto
     print "... finished updating text for %s noticia out of %s ..." % (ind, len(noticiasDF))
     ind+=1
+    
     if ind % 100 == 0 :
+        toUpdate = noticiasDF.iloc[(ind-100):ind, :]
         try : 
-            noticiasDF.to_sql(con=db, name='noticias_concurso', if_exists='replace', flavor='mysql')
+            updateDBPeriodicosGrandes3(toUpdate, insertString)
+            
         except :
             db = MySQLdb.connect(host, user, password, dbname)
             cursor = db.cursor()
-            noticiasDF.to_sql(con=db, name='noticias_concurso', if_exists='replace', flavor='mysql')
+            updateDBPeriodicosGrandes3(toUpdate, insertString)
             print "...  error ... ", sys.exc_info()[0]
 
 # updating some text 
